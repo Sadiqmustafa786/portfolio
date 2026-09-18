@@ -1,0 +1,36 @@
+/* Hero: circle glow pulse */
+@keyframes hero-glow {
+  0%,
+  100% {
+    box-shadow:
+      0 0 24px rgba(1, 135, 144, 0.35),
+      0 0 48px rgba(0, 183, 181, 0.2);
+  }
+  50% {
+    box-shadow:
+      0 0 36px rgba(1, 135, 144, 0.6),
+      0 0 64px rgba(0, 183, 181, 0.35);
+  }
+}
+
+/* Hero: slow continuous rotation (disabled when user prefers reduced motion) */
+@keyframes hero-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Hero left content: fade up (for stagger) */
+@keyframes hero-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
