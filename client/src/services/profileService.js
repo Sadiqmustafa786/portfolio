@@ -1,6 +1,6 @@
 import api from "./api.js";
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || "/api";
+const API_BASE = "https://portfolio-backend-pi-roan.vercel.app/api";
 
 /** Public portfolio profile - for Hero name/display when not logged in */
 export const profileService = {
