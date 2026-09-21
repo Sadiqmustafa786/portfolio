@@ -1,3 +1,4 @@
+
 const express = require("express");
 const dotenv = require("dotenv");
 const cors = require("cors");
@@ -21,10 +22,14 @@ const app = express();
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Static files
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
+// CORS
 app.use(
   cors({
-    origin: "http://localhost:5173", // React frontend
+    origin: "http://localhost:5173",
     credentials: true,
   }),
 );
@@ -39,12 +44,12 @@ app.get("/", (req, res) => {
 });
 
 // API Routes
-app.use("/api/auth", authRoutes); // Authentication routes
-app.use("/api/profile", profileRoutes); // Public portfolio profile (name for Hero)
-app.use("/api/contact", contactRoutes); // Contact form routes
-app.use("/api/projects", projectRoutes); // Projects routes
+app.use("/api/auth", authRoutes);
+app.use("/api/profile", profileRoutes);
+app.use("/api/contact", contactRoutes);
+app.use("/api/projects", projectRoutes);
 
-// 404 Handler - Route not found
+// 404 Handler
 app.use((req, res, next) => {
   res.status(404).json({
     success: false,
@@ -55,6 +60,7 @@ app.use((req, res, next) => {
 // Global Error Handler
 app.use((err, req, res, next) => {
   console.error(err.stack);
+
   res.status(err.status || 500).json({
     success: false,
     message: err.message || "Internal Server Error",
@@ -62,9 +68,15 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Server Start
-const PORT = process.env.PORT || 5000;
+// Export app for Vercel
+module.exports = app;
 
-app.listen(PORT, "0.0.0.0", () => {
-  console.log(`Server running on port ${PORT}`);
-});
+// Local Development Server
+if (require.main === module) {
+  const PORT = process.env.PORT || 5000;
+
+  app.listen(PORT, "0.0.0.0", () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}
+
