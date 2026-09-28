@@ -29,7 +29,12 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 // CORS
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: [
+      "http://localhost:5173",
+      "https://portfolio-frontend-lemon-delta.vercel.app",
+      "https://portfolio-frontend-git-main-sadiq-mustafa.vercel.app",
+      "https://portfolio-frontend-35ehnpkgm-sadiq-mustafa.vercel.app",
+    ],
     credentials: true,
   }),
 );
@@ -79,4 +84,3 @@ if (require.main === module) {
     console.log(`Server running on port ${PORT}`);
   });
 }
-
