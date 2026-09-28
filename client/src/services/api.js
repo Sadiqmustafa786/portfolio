@@ -2,7 +2,7 @@ import axios from "axios";
 import { useAuthStore } from "../stores/authStore";
 
 const api = axios.create({
-  baseURL: "https://portfolio-backend-pi-roan.vercel.app/api",
+  baseURL: "https://portfolio-bp9khq4ye-sadiq-mustafa.vercel.app/api",
   headers: { "Content-Type": "application/json" },
 });
 

@@ -31,7 +31,7 @@ app.use(
   cors({
     origin: [
       "http://localhost:5173",
-     
+      "https://portfolio-client-drab-alpha.vercel.app",
     ],
     credentials: true,
   }),
