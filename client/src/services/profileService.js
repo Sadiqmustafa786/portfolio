@@ -1,6 +1,6 @@
 import api from "./api.js";
 
-const API_BASE = "https://portfolio-bp9khq4ye-sadiq-mustafa.vercel.app/api";
+const API_BASE = "https://portfolio-inky-xi-60.vercel.app/api";
 
 /** Public portfolio profile - for Hero name/display when not logged in */
 export const profileService = {
