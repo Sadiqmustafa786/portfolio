@@ -2,17 +2,17 @@
 const express = require("express");
 const dotenv = require("dotenv");
 const cors = require("cors");
-const path = require("path");
 const connectDB = require("./config/db");
+
+// Load environment variables before routes initialize integrations such as Cloudinary.
+dotenv.config();
 
 // Import Routes
 const authRoutes = require("./routes/authRoutes");
 const contactRoutes = require("./routes/contactRoutes");
 const projectRoutes = require("./routes/projectRoutes");
 const profileRoutes = require("./routes/profileRoutes");
-
-// Config
-dotenv.config();
+const uploadRoutes = require("./routes/uploadRoutes");
 
 // Connect to database
 connectDB();
@@ -22,9 +22,6 @@ const app = express();
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-// Static files
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // CORS
 app.use(
@@ -51,6 +48,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/profile", profileRoutes);
 app.use("/api/contact", contactRoutes);
 app.use("/api/projects", projectRoutes);
+app.use("/api/uploads", uploadRoutes);
 
 // 404 Handler
 app.use((req, res, next) => {

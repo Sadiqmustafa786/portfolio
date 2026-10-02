@@ -27,6 +27,7 @@ const projectSchema = new mongoose.Schema(
       type: String,
       required: [true, "Please upload a project image"],
     },
+    imagePublicId: { type: String, default: null },
     liveUrl: {
       type: String,
       match: [/^https?:\/\/.+/, "Please provide a valid URL"],

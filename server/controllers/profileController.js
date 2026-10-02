@@ -1,20 +1,5 @@
-const fs = require("fs");
-const path = require("path");
 const Admin = require("../models/Admin");
-
-const CV_DIR = path.join(__dirname, "../uploads/cv");
-
-function getCvFilePath(filename) {
-  return path.join(CV_DIR, filename);
-}
-
-function removeCvFile(filename) {
-  if (!filename) return;
-  const filePath = getCvFilePath(filename);
-  if (fs.existsSync(filePath)) {
-    fs.unlinkSync(filePath);
-  }
-}
+const { deleteAsset } = require("../utils/cloudinary");
 
 /**
  * Public portfolio profile - returns first admin's name/email for Hero display.
@@ -69,17 +54,14 @@ exports.downloadCv = async (req, res) => {
       });
     }
 
-    const filePath = getCvFilePath(admin.cv.filename);
-
-    if (!fs.existsSync(filePath)) {
+    if (!admin.cv.url) {
       return res.status(404).json({
         success: false,
         message: "CV file not found",
       });
     }
 
-    const downloadName = admin.cv.originalName || "CV.pdf";
-    res.download(filePath, downloadName);
+    res.redirect(admin.cv.url);
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -124,26 +106,32 @@ exports.getCvInfo = async (req, res) => {
  */
 exports.uploadCv = async (req, res) => {
   try {
-    if (!req.file) {
+    const { url, publicId, originalName } = req.body;
+    if (!url || !publicId || !originalName) {
       return res.status(400).json({
         success: false,
-        message: "Please upload a PDF file",
+        message: "Missing uploaded CV details",
       });
     }
 
     const admin = await Admin.findById(req.admin.id);
-
-    if (admin.cv?.filename) {
-      removeCvFile(admin.cv.filename);
-    }
+    const previousCvPublicId = admin.cv?.filename;
 
     admin.cv = {
-      filename: req.file.filename,
-      originalName: req.file.originalname,
+      filename: publicId,
+      url,
+      originalName,
       uploadedAt: new Date(),
     };
 
     await admin.save();
+
+    if (
+      previousCvPublicId?.startsWith("portfolio/cv/") &&
+      previousCvPublicId !== publicId
+    ) {
+      await deleteAsset(previousCvPublicId, "raw");
+    }
 
     res.status(200).json({
       success: true,
@@ -154,9 +142,6 @@ exports.uploadCv = async (req, res) => {
       },
     });
   } catch (error) {
-    if (req.file?.filename) {
-      removeCvFile(req.file.filename);
-    }
     res.status(500).json({
       success: false,
       message: "Failed to upload CV",
@@ -181,10 +166,13 @@ exports.deleteCv = async (req, res) => {
       });
     }
 
-    removeCvFile(admin.cv.filename);
+    if (admin.cv.filename.startsWith("portfolio/cv/")) {
+      await deleteAsset(admin.cv.filename, "raw");
+    }
 
     admin.cv = {
       filename: null,
+      url: null,
       originalName: null,
       uploadedAt: null,
     };

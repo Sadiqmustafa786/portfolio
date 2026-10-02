@@ -9,12 +9,29 @@ export const profileService = {
   /** Admin: get current CV info */
   getCvInfo: () => api.get("/profile/cv"),
 
-  /** Admin: upload PDF CV (multipart field name: cv) */
-  uploadCv: (file) => {
-    const formData = new FormData();
-    formData.append("cv", file);
-    return api.post("/profile/cv", formData, {
-      headers: { "Content-Type": "multipart/form-data" },
+  /** Admin: upload PDF directly to Cloudinary, then save its URL. */
+  uploadCv: async (file) => {
+    const { data } = await api.post("/uploads/signature", { resourceType: "raw" });
+    const upload = data.data;
+    const form = new FormData();
+    form.append("file", file);
+    form.append("api_key", upload.apiKey);
+    form.append("timestamp", String(upload.timestamp));
+    form.append("folder", upload.folder);
+    form.append("public_id", upload.publicId);
+    form.append("signature", upload.signature);
+
+    const response = await fetch(
+      `https://api.cloudinary.com/v1_1/${upload.cloudName}/${upload.resourceType}/upload`,
+      { method: "POST", body: form },
+    );
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.error?.message || "Cloudinary CV upload failed.");
+
+    return api.post("/profile/cv", {
+      url: result.secure_url,
+      publicId: result.public_id,
+      originalName: file.name,
     });
   },
 

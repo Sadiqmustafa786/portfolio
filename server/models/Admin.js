@@ -24,6 +24,7 @@ const adminSchema = new mongoose.Schema({
   },
   cv: {
     filename: { type: String, default: null },
+    url: { type: String, default: null },
     originalName: { type: String, default: null },
     uploadedAt: { type: Date, default: null },
   },

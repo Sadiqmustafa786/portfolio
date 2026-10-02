@@ -20,6 +20,7 @@ const initialForm = {
   technologies: "",
   imageFile: null,
   image: "",
+  imagePublicId: "",
   liveUrl: "",
   githubUrl: "",
   category: "web",
@@ -79,18 +80,19 @@ export default function ProjectsManage() {
       .split(",")
       .map((t) => t.trim())
       .filter(Boolean);
-    const payload = new FormData();
-    payload.append("title", formData.title.trim());
-    payload.append("description", formData.description.trim());
-    payload.append("longDescription", formData.longDescription?.trim() || "");
-    payload.append("technologies", techArray.join(","));
-    payload.append("liveUrl", formData.liveUrl?.trim() || "");
-    payload.append("githubUrl", formData.githubUrl?.trim() || "");
-    payload.append("category", formData.category);
-    payload.append("featured", String(formData.featured));
-    payload.append("order", String(formData.order));
-    if (formData.imageFile) payload.append("image", formData.imageFile);
-    return payload;
+    return {
+      title: formData.title.trim(),
+      description: formData.description.trim(),
+      longDescription: formData.longDescription?.trim() || "",
+      technologies: techArray,
+      liveUrl: formData.liveUrl?.trim() || "",
+      githubUrl: formData.githubUrl?.trim() || "",
+      category: formData.category,
+      featured: formData.featured,
+      order: Number(formData.order),
+      image: formData.image,
+      imagePublicId: formData.imagePublicId,
+    };
   };
 
   const openAdd = () => {
@@ -112,6 +114,7 @@ export default function ProjectsManage() {
         : "",
       imageFile: null,
       image: project.image || "",
+      imagePublicId: project.imagePublicId || "",
       liveUrl: project.liveUrl || "",
       githubUrl: project.githubUrl || "",
       category: project.category || "web",
@@ -135,6 +138,9 @@ export default function ProjectsManage() {
     setSubmitLoading(true);
     try {
       const payload = buildPayload();
+      if (formData.imageFile) {
+        Object.assign(payload, await projectService.uploadImage(formData.imageFile));
+      }
       if (editingId) {
         const { data } = await projectService.update(editingId, payload);
         const updatedProject = data?.data ?? data;

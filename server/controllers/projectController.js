@@ -1,4 +1,5 @@
 const Project = require("../models/Project");
+const { deleteAsset } = require("../utils/cloudinary");
 
 const parseProjectBody = (body) => ({
   ...body,
@@ -92,9 +93,8 @@ exports.createProject = async (req, res) => {
   try {
     const projectData = parseProjectBody(req.body);
 
-    if (req.file) {
-      projectData.image = `${req.protocol}://${req.get("host")}/uploads/projects/${req.file.filename}`;
-    }
+    projectData.image = req.body.image;
+    projectData.imagePublicId = req.body.imagePublicId;
 
     const project = await Project.create(projectData);
 
@@ -117,24 +117,29 @@ exports.createProject = async (req, res) => {
 // @access  Private (Admin only)
 exports.updateProject = async (req, res) => {
   try {
+    const existingProject = await Project.findById(req.params.id);
+    if (!existingProject) {
+      return res.status(404).json({ success: false, message: "Project not found" });
+    }
+
     const projectData = parseProjectBody(req.body);
 
-    if (req.file) {
-      projectData.image = `${req.protocol}://${req.get("host")}/uploads/projects/${req.file.filename}`;
-    } else {
-      delete projectData.image;
-    }
+    if (req.body.image) projectData.image = req.body.image;
+    else delete projectData.image;
+    if (req.body.imagePublicId) projectData.imagePublicId = req.body.imagePublicId;
+    else delete projectData.imagePublicId;
 
     const project = await Project.findByIdAndUpdate(req.params.id, projectData, {
       new: true,
       runValidators: true,
     });
 
-    if (!project) {
-      return res.status(404).json({
-        success: false,
-        message: "Project not found",
-      });
+    if (
+      project.imagePublicId &&
+      existingProject.imagePublicId &&
+      project.imagePublicId !== existingProject.imagePublicId
+    ) {
+      await deleteAsset(existingProject.imagePublicId, "image");
     }
 
     res.status(200).json({
@@ -163,6 +168,10 @@ exports.deleteProject = async (req, res) => {
         success: false,
         message: "Project not found",
       });
+    }
+
+    if (project.imagePublicId) {
+      await deleteAsset(project.imagePublicId, "image");
     }
 
     res.status(200).json({
