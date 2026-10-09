@@ -20,7 +20,7 @@ export default function About() {
   return (
     <section
       id="about"
-      className="py-20 px-4 bg-white dark:bg-slate-900 overflow-hidden"
+      className="py-10 px-4 bg-white dark:bg-slate-900 overflow-hidden"
     >
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-4">

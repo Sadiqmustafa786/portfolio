@@ -1,6 +1,7 @@
 import { NavLink, Link } from "react-router-dom";
 import { ROUTES, APP_NAME } from "../../utils/constants";
 import { useState } from "react";
+import logo from "../../assets/images/logo.png";
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -15,11 +16,12 @@ export default function Navbar() {
   return (
     <nav className="sticky top-0 z-50 border-b border-slate-700 bg-slate-900/80 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
-        <Link
-          to={ROUTES.HOME}
-          className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-lg font-bold text-transparent"
-        >
-          {APP_NAME}
+        <Link to={ROUTES.HOME} className="flex shrink-0 items-center">
+          <img
+            src={logo}
+            alt={APP_NAME}
+            className="h-10 w-auto object-contain sm:h-11"
+          />
         </Link>
 
         <ul className="hidden items-center gap-5 md:flex">

@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { ROUTES, APP_NAME } from "../../utils/constants";
+import logo from "../../assets/images/logo.png";
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
@@ -8,7 +9,13 @@ export default function Footer() {
     <footer className="border-t border-slate-700 bg-slate-800/50 text-slate-300">
       <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
         <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
-          <span className="font-medium text-primary">{APP_NAME}</span>
+          <Link to={ROUTES.HOME} className="flex shrink-0 items-center">
+            <img
+              src={logo}
+              alt={APP_NAME}
+              className="h-12 w-auto object-contain sm:h-14"
+            />
+          </Link>
           <ul className="flex items-center gap-6">
             <li>
               <Link to={ROUTES.HOME} className="transition-colors hover:text-primary">

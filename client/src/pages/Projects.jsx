@@ -21,7 +21,7 @@ function PageHeader() {
 
 function LoadingSkeleton() {
   return (
-    <div className="py-16 px-4">
+    <div className="py-10 px-4">
       <div className="max-w-6xl mx-auto">
         <PageHeader />
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
