@@ -1,6 +1,6 @@
 import api from "./api.js";
 
-const API_BASE = "https://portfolio-inky-xi-60.vercel.app/api";
+const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
 /** Public portfolio profile - for Hero name/display when not logged in */
 export const profileService = {

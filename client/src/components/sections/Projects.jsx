@@ -1,13 +1,15 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import ProjectCard from "./ProjectCard";
+import SectionStars from "../common/SectionStars";
 import { projectService } from "../../services/projectService";
 import { ROUTES } from "../../utils/constants";
 
 function SectionShell({ children }) {
   return (
-    <section id="projects" className="py-16 px-4 bg-white dark:bg-slate-900">
-      <div className="max-w-6xl mx-auto">
+    <section id="projects" className="relative py-16 px-4 bg-transparent dark:bg-slate-900 overflow-hidden">
+      <SectionStars count={10} />
+      <div className="relative z-10 max-w-6xl mx-auto">
         <div className="text-center mb-10">
           <h2 className="text-3xl sm:text-4xl font-bold text-slate-800 dark:text-slate-100 border-b-2 border-primary pb-2 inline-block">
             Projects

@@ -1,9 +1,19 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import {
+  SiMongodb,
+  SiExpress,
+  SiJavascript,
+  SiTailwindcss,
+  SiBootstrap,
+  SiN8N,
+} from "react-icons/si";
+import { FaReact, FaNodeJs, FaRobot } from "react-icons/fa";
 import { useAuthStore } from "../../stores/authStore";
 import { profileService } from "../../services/profileService";
 import heroImage from "../../assets/images/hero.jpeg";
 import { ROUTES } from "../../utils/constants";
+import SectionStars from "../common/SectionStars";
 
 const HERO_STATS = [
   { value: "650+", label: "Projects Done" },
@@ -19,6 +29,24 @@ const HERO_STAGGER = {
   STATS: "380ms",
   STAT_ITEM: [380, 450, 520],
 };
+
+/**
+ * 9 icons = 360 / 9 = 40deg gap.
+ * Class names are written out in full so Tailwind can detect them.
+ * - slot:    rotates the wrapper to its position on the circle
+ * - counter: cancels that rotation so the icon stays upright
+ */
+const TECH_ICONS = [
+  { name: "MongoDB", Icon: SiMongodb, color: "text-green-600", slot: "rotate-[0deg]", counter: "rotate-[0deg]" },
+  { name: "Express", Icon: SiExpress, color: "text-slate-600 dark:text-slate-300", slot: "rotate-[40deg]", counter: "rotate-[-40deg]" },
+  { name: "React", Icon: FaReact, color: "text-sky-400", slot: "rotate-[80deg]", counter: "rotate-[-80deg]" },
+  { name: "Node.js", Icon: FaNodeJs, color: "text-green-500", slot: "rotate-[120deg]", counter: "rotate-[-120deg]" },
+  { name: "JavaScript", Icon: SiJavascript, color: "text-yellow-400", slot: "rotate-[160deg]", counter: "rotate-[-160deg]" },
+  { name: "Tailwind CSS", Icon: SiTailwindcss, color: "text-cyan-400", slot: "rotate-[200deg]", counter: "rotate-[-200deg]" },
+  { name: "Bootstrap", Icon: SiBootstrap, color: "text-purple-600", slot: "rotate-[240deg]", counter: "rotate-[-240deg]" },
+  { name: "AI Automation", Icon: FaRobot, color: "text-violet-500", slot: "rotate-[280deg]", counter: "rotate-[-280deg]" },
+  { name: "n8n", Icon: SiN8N, color: "text-rose-500", slot: "rotate-[320deg]", counter: "rotate-[-320deg]" },
+];
 
 export default function Hero() {
   const user = useAuthStore((state) => state.user);
@@ -48,9 +76,11 @@ export default function Hero() {
 
   return (
     <section
-      className="min-h-[70vh] flex flex-col justify-center px-4 py-16 bg-white dark:bg-slate-900 relative overflow-hidden"
+      className="min-h-[65vh] flex flex-col justify-center px-4 py-16 bg-white dark:bg-slate-900 relative overflow-hidden"
       aria-label="Hero introduction"
     >
+      <SectionStars count={10} />
+
       {/* Subtle background gradient for depth */}
       <div
         className="absolute inset-0 pointer-events-none opacity-[0.03] dark:opacity-[0.06]"
@@ -144,8 +174,9 @@ export default function Hero() {
               </svg>
             </Link>
           </div>
+
           {/* Stats with staggered pop-in */}
-          <div className="flex flex-wrap gap-8 sm:gap-12">
+          <div className="flex flex-wrap justify-center md:justify-start gap-8 sm:gap-12">
             {HERO_STATS.map(({ value, label }, i) => (
               <div
                 key={label}
@@ -166,9 +197,10 @@ export default function Hero() {
           </div>
         </div>
 
-        {/* Right: image with decorative circle and floating badges */}
+        {/* Right: image */}
         <div className="order-1 md:order-2 relative flex justify-center md:justify-end">
           <div className="relative w-72 h-72 sm:w-96 sm:h-96">
+            {/* Gradient circle + image */}
             <div
               className="hero-animate absolute inset-0 rounded-full bg-linear-to-br from-primary to-secondary p-2 sm:p-2.5"
               style={{
@@ -187,75 +219,25 @@ export default function Hero() {
               </div>
             </div>
 
-            {/* Floating skill badges with staggered float animation */}
-            <div
-              className="hero-animate absolute -top-2 right-0 w-12 h-12 rounded-full border-2 border-primary/80 bg-white dark:bg-slate-100 flex items-center justify-center shadow-lg"
-              style={{
-                animation: "hero-float 3s ease-in-out infinite",
-                animationDelay: "0s",
-              }}
-              title="Mobile-first"
-              aria-hidden
-            >
-              <svg
-                className="w-5 h-5 text-primary"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"
-                />
-              </svg>
-            </div>
-            <div
-              className="hero-animate absolute -left-[80px] top-1/2 -translate-y-1/2 w-12 h-12 rounded-full border-2 border-primary/80 bg-white dark:bg-slate-100 items-center justify-center shadow-lg max-sm:hidden sm:flex"
-              style={{
-                animation: "hero-float 3s ease-in-out infinite",
-                animationDelay: "0.4s",
-              }}
-              title="Full-stack"
-              aria-hidden
-            >
-              <svg
-                className="w-5 h-5 text-primary"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                />
-              </svg>
-            </div>
-            <div
-              className="hero-animate absolute -bottom-2 right-4 w-12 h-12 rounded-full border-2 border-primary/80 bg-white dark:bg-slate-100 flex items-center justify-center shadow-lg"
-              style={{
-                animation: "hero-float 3s ease-in-out infinite",
-                animationDelay: "0.8s",
-              }}
-              title="UI/UX"
-              aria-hidden
-            >
-              <svg
-                className="w-5 h-5 text-primary"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                />
-              </svg>
+            {/* Tech icons orbiting the circle (Tailwind only) */}
+            <div className="absolute inset-0 pointer-events-none animate-[spin_30s_linear_infinite] motion-reduce:animate-none">
+              {TECH_ICONS.map(({ name, Icon, color, slot, counter }) => (
+                <div key={name} className={`absolute inset-0 ${slot}`}>
+                  <div
+                    className={`absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 ${counter}`}
+                  >
+                    <div
+                      title={name}
+                      className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white dark:bg-slate-800 shadow-md ring-1 ring-primary/30 flex items-center justify-center animate-[spin_30s_linear_infinite_reverse] motion-reduce:animate-none"
+                    >
+                      <Icon
+                        className={`w-4 h-4 sm:w-5 sm:h-5 ${color}`}
+                        aria-label={name}
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>

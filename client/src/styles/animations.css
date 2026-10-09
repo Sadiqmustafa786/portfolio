@@ -1,3 +1,7 @@
+/* ==========================================================
+   HERO
+   ========================================================== */
+
 /* Hero: circle glow pulse */
 @keyframes hero-glow {
   0%,
@@ -13,7 +17,7 @@
   }
 }
 
-/* Hero: slow continuous rotation (disabled when user prefers reduced motion) */
+/* Hero: slow continuous rotation */
 @keyframes hero-spin {
   from {
     transform: rotate(0deg);
@@ -32,5 +36,158 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+/* Hero: image circle scale in */
+@keyframes hero-scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Hero: stats pop in */
+@keyframes hero-stat-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ==========================================================
+   SKILLS: right-to-left marquee
+   ========================================================== */
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 30s linear infinite;
+}
+
+/* ==========================================================
+   STARS: float upward forever + glow + gentle sway
+   ========================================================== */
+
+/* Vertical travel (outer element) */
+@keyframes star-float {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-115vh);
+  }
+}
+
+/* Glow pulse (inner element) */
+@keyframes star-glow {
+  0%,
+  100% {
+    opacity: 0.65;
+    box-shadow: 0 0 4px 1px currentColor;
+  }
+  50% {
+    opacity: 1;
+    box-shadow: 0 0 10px 3px currentColor;
+  }
+}
+
+/* Sideways sway (inner element) */
+@keyframes star-sway {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(var(--dx));
+  }
+}
+
+.star-float {
+  animation: star-float var(--float) linear infinite;
+}
+
+.star {
+  animation:
+    star-glow var(--glow) ease-in-out infinite,
+    star-sway var(--sway) ease-in-out infinite alternate;
+}
+
+@keyframes section-star-rise {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) scale(0.7);
+  }
+  15% {
+    opacity: 0.9;
+  }
+  60% {
+    opacity: 0.7;
+    transform: translate3d(var(--dx), -60px, 0) scale(1.2);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(calc(var(--dx) * 1.5), -120px, 0) scale(0.75);
+  }
+}
+
+.section-glow-layer {
+  height: 60vh;
+  opacity: 1;
+  background: linear-gradient(to top, rgba(1, 135, 144, 0.12), transparent 72%);
+}
+
+.section-starfield {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.section-star {
+  position: absolute;
+  border-radius: 9999px;
+  opacity: 1;
+  background: radial-gradient(circle, rgba(255, 255, 255, 1) 0%, rgba(0, 183, 181, 1) 30%, rgba(1, 135, 144, 0.45) 60%, transparent 100%);
+  box-shadow:
+    0 0 10px rgba(255, 255, 255, 0.9),
+    0 0 18px rgba(0, 183, 181, 0.9),
+    0 0 32px rgba(1, 135, 144, 0.5);
+  filter: blur(0.2px);
+  animation: section-star-rise ease-in-out infinite;
+}
+
+/* ==========================================================
+   Reduced motion: stop continuous animations
+   ========================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee,
+  .star-float,
+  .star {
+    animation: none;
+  }
+
+  .star-float {
+    top: 50%;
+  }
+
+  .star {
+    opacity: 0.8;
   }
 }

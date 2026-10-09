@@ -1,3 +1,5 @@
+import SectionStars from "../common/SectionStars";
+
 const HIGHLIGHTS = [
   {
     title: "Full-Stack",
@@ -20,9 +22,10 @@ export default function About() {
   return (
     <section
       id="about"
-      className="py-20 px-4 bg-white dark:bg-slate-900 overflow-hidden"
+      className="relative py-20 px-4 bg-transparent dark:bg-slate-900 overflow-hidden"
     >
-      <div className="max-w-5xl mx-auto">
+      <SectionStars count={8} />
+      <div className="relative z-10 max-w-5xl mx-auto">
         <div className="text-center mb-4">
           <h2 className="text-3xl sm:text-4xl font-bold text-slate-800 dark:text-slate-100 border-b-2 border-primary pb-2 inline-block">
             About Me

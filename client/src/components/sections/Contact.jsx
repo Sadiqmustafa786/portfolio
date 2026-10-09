@@ -1,10 +1,13 @@
+import SectionStars from "../common/SectionStars";
+
 export default function Contact() {
   return (
     <section
       id="contact"
-      className="py-16 px-4 bg-slate-50 dark:bg-slate-800/50"
+      className="relative py-16 px-4 bg-transparent dark:bg-slate-900 overflow-hidden"
     >
-      <div className="max-w-xl mx-auto text-center">
+      <SectionStars count={7} />
+      <div className="relative z-10 max-w-xl mx-auto text-center">
         <h2 className="text-3xl font-bold text-slate-800 dark:text-slate-100 mb-4 border-b-2 border-primary pb-2 inline-block">
           Get in Touch
         </h2>

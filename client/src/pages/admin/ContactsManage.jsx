@@ -72,28 +72,30 @@ export default function ContactsManage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-100 py-8 px-4">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen bg-slate-100 py-8 px-4 dark:bg-slate-950">
+      <div className="mx-auto max-w-4xl">
         <header className="mb-8">
           <Link
             to={ROUTES.ADMIN_DASHBOARD}
-            className="text-slate-600 hover:text-slate-800 text-sm mb-1 inline-block"
+            className="mb-1 inline-block text-sm text-slate-600 hover:text-slate-800 dark:text-slate-300 dark:hover:text-slate-100"
           >
             ← Dashboard
           </Link>
-          <h1 className="text-2xl font-bold text-slate-800">Manage Contacts</h1>
+          <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100">
+            Manage Contacts
+          </h1>
         </header>
 
         {loading ? (
-          <div className="bg-white rounded-xl border border-slate-200 p-12 text-center text-slate-600">
+          <div className="rounded-xl border border-slate-200 bg-white p-12 text-center text-slate-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300">
             Loading...
           </div>
         ) : error ? (
-          <div className="bg-white rounded-xl border border-slate-200 p-12 text-center text-red-600">
+          <div className="rounded-xl border border-slate-200 bg-white p-12 text-center text-red-600 dark:border-slate-700 dark:bg-slate-800 dark:text-red-400">
             {error}
           </div>
         ) : contacts.length === 0 ? (
-          <div className="bg-white rounded-xl border border-slate-200 p-12 text-center text-slate-600">
+          <div className="rounded-xl border border-slate-200 bg-white p-12 text-center text-slate-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300">
             No contact messages yet.
           </div>
         ) : (
@@ -103,46 +105,46 @@ export default function ContactsManage() {
               return (
                 <div
                   key={id}
-                  className={`bg-white rounded-xl border p-4 ${
+                  className={`rounded-xl border p-4 ${
                     c.isRead
-                      ? "border-slate-200"
-                      : "border-slate-300 bg-slate-50/50"
+                      ? "border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-800"
+                      : "border-slate-300 bg-slate-50/50 dark:border-slate-600 dark:bg-slate-800/80"
                   }`}
                 >
-                  <div className="flex items-start justify-between gap-4 flex-wrap">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="font-semibold text-slate-800">
+                  <div className="flex flex-wrap items-start justify-between gap-4">
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="font-semibold text-slate-800 dark:text-slate-100">
                           {c.name}
                         </span>
                         <a
                           href={`mailto:${c.email}`}
-                          className="text-sm text-slate-600 hover:underline"
+                          className="text-sm text-slate-600 hover:underline dark:text-slate-300"
                         >
                           {c.email}
                         </a>
                         {!c.isRead && (
-                          <span className="text-xs px-2 py-0.5 bg-blue-100 text-blue-800 rounded">
+                          <span className="rounded bg-blue-100 px-2 py-0.5 text-xs text-blue-800 dark:bg-blue-900/40 dark:text-blue-200">
                             New
                           </span>
                         )}
                       </div>
-                      <p className="text-sm font-medium text-slate-700 mt-1">
+                      <p className="mt-1 text-sm font-medium text-slate-700 dark:text-slate-200">
                         {c.subject}
                       </p>
-                      <p className="text-sm text-slate-600 mt-1 line-clamp-2">
+                      <p className="mt-1 line-clamp-2 text-sm text-slate-600 dark:text-slate-300">
                         {c.message}
                       </p>
-                      <p className="text-xs text-slate-500 mt-2">
+                      <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
                         {formatDateTime(c.createdAt)}
                       </p>
                     </div>
-                    <div className="flex gap-2 shrink-0">
+                    <div className="flex shrink-0 gap-2">
                       {!c.isRead && (
                         <Button
                           type="button"
                           onClick={() => handleMarkRead(id)}
-                          className="px-3 py-1.5 text-sm border border-slate-300 rounded-lg hover:bg-slate-50"
+                          className="rounded-lg border border-slate-300 px-3 py-1.5 text-sm hover:bg-slate-50 dark:border-slate-600 dark:hover:bg-slate-700"
                         >
                           Mark read
                         </Button>
@@ -150,7 +152,7 @@ export default function ContactsManage() {
                       <Button
                         type="button"
                         onClick={() => handleDelete(id)}
-                        className="px-3 py-1.5 text-sm border border-red-200 text-red-700 rounded-lg hover:bg-red-50"
+                        className="rounded-lg border border-red-200 px-3 py-1.5 text-sm text-red-700 hover:bg-red-50 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-900/30"
                       >
                         Delete
                       </Button>

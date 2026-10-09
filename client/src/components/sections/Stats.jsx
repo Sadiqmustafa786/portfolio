@@ -1,3 +1,5 @@
+import SectionStars from "../common/SectionStars";
+
 const STATS = [
   {
     label: "Projects",
@@ -20,7 +22,7 @@ const STATS = [
   },
   {
     label: "Experience",
-    value: "2+ yrs",
+    value: "1+ yrs",
     icon: (
       <svg
         className="w-8 h-8"
@@ -39,7 +41,7 @@ const STATS = [
   },
   {
     label: "Happy Clients",
-    value: "5+",
+    value: "3+",
     icon: (
       <svg
         className="w-8 h-8"
@@ -60,8 +62,9 @@ const STATS = [
 
 export default function Stats() {
   return (
-    <section className="py-20 px-4 bg-primary text-white overflow-hidden">
-      <div className="max-w-5xl mx-auto">
+    <section className="relative py-20 px-4 bg-primary text-white overflow-hidden">
+      <SectionStars count={9} />
+      <div className="relative z-10 max-w-5xl mx-auto">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-10 sm:gap-8">
           {STATS.map((item, index) => (
             <div

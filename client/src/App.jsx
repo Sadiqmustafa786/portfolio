@@ -16,6 +16,7 @@ import ContactsManage from "./pages/admin/ContactsManage";
 import CvManage from "./pages/admin/CvManage";
 import AdminRegister from "./pages/admin/Register";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
+import AdminLayout from "./components/admin/AdminLayout";
 
 function App() {
   return (
@@ -37,10 +38,12 @@ function App() {
           <Route path="register" element={<AdminRegister />} />
 
           <Route element={<ProtectedRoute />}>
-            <Route index element={<AdminDashboard />} />
-            <Route path="projects" element={<ProjectsManage />} />
-            <Route path="contacts" element={<ContactsManage />} />
-            <Route path="cv" element={<CvManage />} />
+            <Route element={<AdminLayout />}>
+              <Route index element={<AdminDashboard />} />
+              <Route path="projects" element={<ProjectsManage />} />
+              <Route path="contacts" element={<ContactsManage />} />
+              <Route path="cv" element={<CvManage />} />
+            </Route>
           </Route>
         </Route>
 

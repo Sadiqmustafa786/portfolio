@@ -103,12 +103,30 @@
   }
 }
 
+/* Skills marquee: right-to-left continuous movement */
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 22s linear infinite;
+  will-change: transform;
+}
+
 /* Respect user motion preference - disable hero animations when reduced motion requested */
 @media (prefers-reduced-motion: reduce) {
   .hero-animate {
     animation: none !important;
   }
   .contact-animate {
+    animation: none !important;
+  }
+  .animate-marquee {
     animation: none !important;
   }
 }

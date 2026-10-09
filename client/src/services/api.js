@@ -2,8 +2,9 @@ import axios from "axios";
 import { useAuthStore } from "../stores/authStore";
 
 const api = axios.create({
-  baseURL: "https://portfolio-inky-xi-60.vercel.app/api",
+  baseURL: import.meta.env.VITE_API_URL || "http://localhost:3000/api",
   headers: { "Content-Type": "application/json" },
+  withCredentials: true,
 });
 
 api.interceptors.request.use((config) => {
