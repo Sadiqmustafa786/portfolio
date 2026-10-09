@@ -39,7 +39,7 @@ export default function About() {
         </AnimateIn>
 
         <div className="grid md:grid-cols-2 gap-12 items-start mb-14">
-          <AnimateIn direction="left">
+          <AnimateIn className="duration-1000" direction="left">
             <div className="space-y-4 text-slate-600 dark:text-slate-300 leading-relaxed">
               <p>
                 I'm a{" "}
@@ -58,7 +58,7 @@ export default function About() {
               </p>
             </div>
           </AnimateIn>
-          <AnimateIn delay={150} direction="right">
+          <AnimateIn className="duration-1000" delay={150} direction="right">
             <div className="rounded-2xl p-6 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 shadow-sm">
               <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-100 mb-3 flex items-center gap-2">
                 <span className="w-1 h-6 rounded-full bg-primary" />

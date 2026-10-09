@@ -23,8 +23,8 @@ export default function AnimateIn({
   const hiddenTransform = {
     up: "translate-y-8",
     down: "-translate-y-8",
-    left: "translate-x-8",
-    right: "-translate-x-8",
+    left: "-translate-x-[100vw]",
+    right: "translate-x-[100vw]",
   }[direction] ?? "translate-y-8";
 
   useEffect(() => {
