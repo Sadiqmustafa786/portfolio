@@ -14,6 +14,7 @@ export default function AnimateIn({
   className = "",
   delay = 0,
   direction = "up",
+  animateOnMount = false,
   options = DEFAULT_OPTIONS,
 }) {
   const [inView, setInView] = useState(false);
@@ -30,13 +31,18 @@ export default function AnimateIn({
     const el = ref.current;
     if (!el) return;
 
+    if (animateOnMount) {
+      const frame = requestAnimationFrame(() => setInView(true));
+      return () => cancelAnimationFrame(frame);
+    }
+
     const observer = new IntersectionObserver(([entry]) => {
       if (entry.isIntersecting) setInView(true);
     }, options);
 
     observer.observe(el);
     return () => observer.disconnect();
-  }, [options]);
+  }, [animateOnMount, options]);
 
   return (
     <div
