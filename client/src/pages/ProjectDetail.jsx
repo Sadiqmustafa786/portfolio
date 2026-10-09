@@ -1,272 +1,213 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { projectService } from "../services/projectService";
 import { ROUTES } from "../utils/constants";
+
+function ArrowIcon({ diagonal = false }) {
+  return diagonal ? (
+    <svg aria-hidden="true" viewBox="0 0 20 20" fill="none" className="h-3.5 w-3.5 shrink-0">
+      <path d="M5 15 15 5M6 5h9v9" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  ) : (
+    <svg aria-hidden="true" viewBox="0 0 20 20" fill="none" className="h-3.5 w-3.5 shrink-0">
+      <path d="M16 10H4m0 0 5-5m-5 5 5 5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function LoadingState() {
+  return (
+    <div className="w-full animate-pulse" aria-label="Loading project">
+      <div className="mb-5 h-3.5 w-24 rounded bg-slate-200 dark:bg-slate-700 sm:mb-6 sm:w-28" />
+      <div className="mb-2 h-3.5 w-16 rounded bg-slate-200 dark:bg-slate-700" />
+      <div className="mb-6 h-7 w-3/4 max-w-md rounded bg-slate-200 dark:bg-slate-700 sm:mb-8 sm:h-8" />
+      <div className="mb-6 aspect-[4/3] rounded-xl bg-slate-200 dark:bg-slate-700 sm:mb-8 sm:aspect-video sm:rounded-2xl" />
+      <div className="mb-3 flex flex-col gap-2 sm:flex-row">
+        <div className="h-10 w-full rounded-full bg-slate-200 dark:bg-slate-700 sm:w-32" />
+        <div className="h-10 w-full rounded-full bg-slate-200 dark:bg-slate-700 sm:w-28" />
+      </div>
+      <div className="mb-3 h-4 w-full rounded bg-slate-200 dark:bg-slate-700" />
+      <div className="h-4 w-4/5 max-w-xl rounded bg-slate-200 dark:bg-slate-700" />
+    </div>
+  );
+}
+
+function EmptyState({ message }) {
+  return (
+    <div className="grid min-h-[50vh] place-items-center py-10 sm:min-h-[55vh] sm:py-16">
+      <div className="mx-auto w-full max-w-md text-center">
+        <div className="mx-auto mb-4 grid h-12 w-12 place-items-center rounded-2xl bg-primary/10 text-primary sm:mb-5 sm:h-14 sm:w-14">
+          <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" className="h-6 w-6 sm:h-7 sm:w-7">
+            <path d="M12 8v4m0 4h.01M4.9 19h14.2a1.5 1.5 0 0 0 1.3-2.25L13.3 4.5a1.5 1.5 0 0 0-2.6 0L3.6 16.75A1.5 1.5 0 0 0 4.9 19Z" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
+          </svg>
+        </div>
+        <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-primary sm:text-sm">Project unavailable</p>
+        <h1 className="mb-3 text-xl font-bold text-slate-900 dark:text-white sm:text-2xl">We couldn&apos;t find this project</h1>
+        <p className="mb-6 text-sm text-slate-600 dark:text-slate-400 sm:mb-7 sm:text-base">
+          {message || "It may have been removed, or the link may be outdated."}
+        </p>
+        <Link
+          to={ROUTES.PROJECTS}
+          className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-semibold text-white transition hover:bg-primary/90"
+        >
+          <ArrowIcon /> Back to projects
+        </Link>
+      </div>
+    </div>
+  );
+}
 
 export default function ProjectDetail() {
   const { id } = useParams();
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [imgError, setImgError] = useState(false);
 
   useEffect(() => {
-    if (!id) {
-      const timer = setTimeout(() => {
-        setLoading(false);
-        setError("Invalid project.");
-      }, 0);
-      return () => clearTimeout(timer);
-    }
-    let cancelled = false;
-    const timer = setTimeout(() => {
-      setError("");
-      setImgError(false);
-      setLoading(true);
-    }, 0);
+    let active = true;
+    setLoading(true);
+    setError("");
     projectService
       .getById(id)
-      .then((res) => {
-        if (cancelled) return;
-        const data = res.data?.data ?? res.data;
-        setProject(data ?? null);
+      .then(({ data }) => {
+        if (!active) return;
+        const result = data?.data ?? data;
+        setProject(result?.project ?? result ?? null);
       })
       .catch((err) => {
-        if (cancelled) return;
+        if (!active) return;
+        setError(err.response?.data?.message || err.response?.data?.error || "Please check the link and try again.");
         setProject(null);
-        setError(
-          err.response?.status === 404
-            ? "Project not found."
-            : err.response?.data?.message ||
-                err.response?.data?.error ||
-                err.message ||
-                "Failed to load project.",
-        );
       })
       .finally(() => {
-        if (!cancelled) setLoading(false);
+        if (active) setLoading(false);
       });
-    return () => {
-      cancelled = true;
-      clearTimeout(timer);
-    };
+    return () => { active = false; };
   }, [id]);
 
-  if (loading) {
-    return (
-      <div className="py-16 max-w-4xl mx-auto px-4">
-        <div className="animate-pulse space-y-6">
-          <div className="h-4 w-32 rounded bg-slate-200 dark:bg-slate-700" />
-          <div className="aspect-video rounded-2xl bg-slate-200 dark:bg-slate-700" />
-          <div className="h-8 w-3/4 rounded bg-slate-200 dark:bg-slate-700" />
-          <div className="h-4 w-full rounded bg-slate-200 dark:bg-slate-700" />
-          <div className="h-4 w-5/6 rounded bg-slate-200 dark:bg-slate-700" />
-        </div>
-        <p className="text-center text-slate-500 dark:text-slate-400 text-sm mt-8">
-          Loading project...
-        </p>
-      </div>
-    );
-  }
+  if (loading) return <LoadingState />;
+  if (error || !project) return <EmptyState message={error} />;
 
-  if (error || !project) {
-    return (
-      <div className="py-16 max-w-lg mx-auto px-4">
-        <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-8 text-center shadow-sm">
-          <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
-            <svg
-              className="w-7 h-7 text-red-600 dark:text-red-400"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-              />
-            </svg>
-          </div>
-          <h2 className="text-lg font-semibold text-slate-800 dark:text-slate-100 mb-2">
-            Unable to load project
-          </h2>
-          <p className="text-slate-600 dark:text-slate-400 text-sm mb-6">
-            {error || "Project not found."}
-          </p>
-          <Link
-            to={ROUTES.PROJECTS}
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-lg font-medium hover:bg-primary/90 transition-colors"
-          >
-            <svg
-              className="w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M10 19l-7-7m0 0l7-7m-7 7h18"
-              />
-            </svg>
-            Back to projects
-          </Link>
-        </div>
-      </div>
-    );
-  }
-
-  const techList = project.technologies?.length ? project.technologies : [];
-  const hasImage = project.image && !imgError;
+  const technologies = Array.isArray(project.technologies)
+    ? project.technologies
+    : project.tech
+      ? [project.tech]
+      : [];
+  const description = project.longDescription || project.description || "More details about this project will be added soon.";
 
   return (
-    <article className="pb-16">
-      <div className="max-w-4xl mx-auto px-4">
+    <div className="relative w-full overflow-x-hidden pb-8 sm:pb-12 lg:pb-16">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -right-24 -top-16 hidden h-56 w-56 rounded-full bg-primary/10 blur-3xl sm:block md:-right-16 md:h-72 md:w-72"
+      />
+
+      <div className="relative mx-auto w-full max-w-4xl">
         <Link
           to={ROUTES.PROJECTS}
-          className="inline-flex items-center gap-2 text-slate-600 dark:text-slate-400 hover:text-primary text-sm font-medium mb-8 transition-colors"
+          className="mb-5 inline-flex min-h-10 items-center gap-2 text-sm font-medium text-slate-600 transition hover:text-primary dark:text-slate-400 dark:hover:text-secondary sm:mb-7"
         >
-          <svg
-            className="w-4 h-4"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M10 19l-7-7m0 0l7-7m-7 7h18"
-            />
-          </svg>
-          Back to projects
+          <ArrowIcon /> All projects
         </Link>
 
-        <header className="mb-8">
-          <div className="flex flex-wrap items-center gap-2 mb-3">
+        <header className="mb-5 sm:mb-7">
+          <div className="mb-2.5 flex flex-wrap items-center gap-1.5 sm:mb-3 sm:gap-2">
             {project.category && (
-              <span className="text-xs font-medium uppercase tracking-wider px-2.5 py-1 rounded bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">
+              <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-primary dark:bg-primary/20 dark:text-secondary sm:text-[11px]">
                 {project.category}
               </span>
             )}
             {project.featured && (
-              <span className="text-xs font-medium px-2.5 py-1 rounded bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-200">
+              <span className="rounded-full bg-amber-100 px-2.5 py-0.5 text-[10px] font-semibold text-amber-800 dark:bg-amber-900/40 dark:text-amber-200 sm:text-[11px]">
                 Featured
               </span>
             )}
           </div>
-          <h1 className="text-3xl sm:text-4xl font-bold text-slate-800 dark:text-slate-100 leading-tight">
+          <h1 className="break-words text-xl font-bold leading-snug tracking-tight text-slate-950 dark:text-white sm:text-2xl md:text-3xl">
             {project.title}
           </h1>
         </header>
 
-        {hasImage ? (
-          <div className="rounded-2xl overflow-hidden shadow-xl border border-slate-200 dark:border-slate-700 mb-8">
+        <figure className="overflow-hidden rounded-xl border border-slate-200/80 bg-slate-100 shadow-lg shadow-slate-900/5 dark:border-slate-700 dark:bg-slate-800 sm:rounded-2xl sm:shadow-xl sm:shadow-slate-900/8">
+          {project.image ? (
             <img
               src={project.image}
-              alt={project.title}
-              className="w-full aspect-video object-cover"
-              onError={() => setImgError(true)}
+              alt={`${project.title} preview`}
+              className="h-auto max-h-[240px] w-full object-cover object-top sm:max-h-[380px] md:max-h-[460px] lg:max-h-[520px]"
             />
-          </div>
-        ) : (
-          <div className="rounded-2xl aspect-video bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center mb-8">
-            <svg
-              className="w-16 h-16 text-slate-400 dark:text-slate-500"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={1.5}
-                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-              />
-            </svg>
-          </div>
-        )}
-
-        <p className="text-lg text-slate-600 dark:text-slate-300 leading-relaxed mb-8">
-          {project.description}
-        </p>
-
-        {project.longDescription && (
-          <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 p-6 mb-8">
-            <h2 className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4">
-              About this project
-            </h2>
-            <div className="prose prose-slate dark:prose-invert max-w-none">
-              <p className="text-slate-600 dark:text-slate-300 whitespace-pre-wrap leading-relaxed">
-                {project.longDescription}
-              </p>
+          ) : (
+            <div className="grid aspect-[4/3] place-items-center bg-gradient-to-br from-primary/15 via-slate-100 to-secondary/20 dark:from-primary/25 dark:via-slate-800 dark:to-secondary/10 sm:aspect-video">
+              <span className="max-w-[90%] truncate px-4 text-center text-lg font-bold tracking-tight text-primary/60 dark:text-secondary/70 sm:text-2xl">
+                {project.title}
+              </span>
             </div>
-          </div>
-        )}
+          )}
+        </figure>
 
-        {techList.length > 0 && (
-          <div className="mb-8">
-            <h2 className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">
-              Technologies
+        <div className="mt-6 grid grid-cols-1 gap-8 sm:mt-8 lg:grid-cols-[minmax(0,1fr)_220px] lg:gap-12">
+          <section className="min-w-0">
+            {(project.liveUrl || project.githubUrl) && (
+              <div className="mb-5 flex flex-col gap-2.5 sm:mb-6 sm:flex-row sm:flex-wrap sm:gap-3">
+                {project.liveUrl && (
+                  <a
+                    href={project.liveUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-primary/20 transition hover:-translate-y-0.5 hover:bg-primary/90 sm:w-auto"
+                  >
+                    Visit live site <ArrowIcon diagonal />
+                  </a>
+                )}
+                {project.githubUrl && (
+                  <a
+                    href={project.githubUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-full border border-slate-300 bg-white/80 px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:-translate-y-0.5 hover:border-primary hover:text-primary dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 sm:w-auto"
+                  >
+                    View source <ArrowIcon diagonal />
+                  </a>
+                )}
+              </div>
+            )}
+
+            <p className="mb-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-primary sm:mb-2 sm:text-[11px]">Overview</p>
+            <h2 className="mb-2.5 text-base font-bold text-slate-900 dark:text-white sm:mb-3 sm:text-lg">About this project</h2>
+            <p className="whitespace-pre-line break-words text-sm leading-7 text-slate-600 dark:text-slate-300 sm:text-[15px]">
+              {description}
+            </p>
+          </section>
+
+          <aside className="h-fit rounded-xl border border-slate-200 bg-white/80 p-4 dark:border-slate-700 dark:bg-slate-800/70 sm:rounded-2xl sm:p-5">
+            <h2 className="mb-3 text-[11px] font-bold uppercase tracking-[0.16em] text-slate-800 dark:text-slate-100 sm:text-xs">
+              Built with
             </h2>
-            <div className="flex flex-wrap gap-2">
-              {techList.map((t) => (
-                <span
-                  key={t}
-                  className="text-sm px-3 py-1.5 rounded-full bg-primary/10 dark:bg-primary/20 text-primary font-medium"
-                >
-                  {t}
-                </span>
-              ))}
-            </div>
-          </div>
-        )}
+            {technologies.length ? (
+              <ul className="flex flex-wrap gap-1.5 sm:gap-2">
+                {technologies.map((technology) => (
+                  <li
+                    key={technology}
+                    className="rounded-full bg-primary/10 px-2.5 py-1 text-[11px] font-medium text-primary dark:bg-primary/20 dark:text-secondary sm:text-xs"
+                  >
+                    {technology}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-sm text-slate-500 dark:text-slate-400">Technology details coming soon.</p>
+            )}
+          </aside>
+        </div>
 
-        <div className="flex flex-wrap gap-3 pt-4 border-t border-slate-200 dark:border-slate-700">
-          {project.liveUrl && (
-            <a
-              href={project.liveUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-lg font-medium hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20"
-            >
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                />
-              </svg>
-              View live
-            </a>
-          )}
-          {project.githubUrl && (
-            <a
-              href={project.githubUrl || "https://github.com/Sadiqmustafa786/"}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-5 py-2.5 border-2 border-primary text-primary rounded-lg font-medium hover:bg-primary/10 transition-colors"
-            >
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                <path
-                  fillRule="evenodd"
-                  d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              GitHub
-            </a>
-          )}
+        <div className="mt-8 border-t border-slate-200 pt-5 dark:border-slate-700 sm:mt-12 sm:pt-6">
+          <Link
+            to={ROUTES.PROJECTS}
+            className="inline-flex min-h-10 items-center gap-2 text-sm font-semibold text-primary transition hover:gap-3 dark:text-secondary"
+          >
+            <ArrowIcon /> Explore more projects
+          </Link>
         </div>
       </div>
-    </article>
+    </div>
   );
 }
