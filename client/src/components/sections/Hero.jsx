@@ -52,6 +52,7 @@ export default function Hero() {
   const user = useAuthStore((state) => state.user);
   const [publicProfile, setPublicProfile] = useState(null);
   const [cvDownloading, setCvDownloading] = useState(false);
+  const [cvDownloadError, setCvDownloadError] = useState("");
 
   useEffect(() => {
     profileService
@@ -81,11 +82,11 @@ export default function Hero() {
     event.preventDefault();
     if (cvDownloading) return;
     setCvDownloading(true);
+    setCvDownloadError("");
     try {
       await profileService.downloadCvFile(cvFileName);
-    } catch {
-      // Fallback: open API download URL directly (not the frontend)
-      window.location.assign(profileService.getCvDownloadUrl());
+    } catch (error) {
+      setCvDownloadError(error.message || "Failed to download CV.");
     } finally {
       setCvDownloading(false);
     }
@@ -192,6 +193,11 @@ export default function Hero() {
               </svg>
             </Link>
           </div>
+          {cvDownloadError && (
+            <p className="mb-6 text-sm text-red-600 dark:text-red-400" role="alert">
+              {cvDownloadError}
+            </p>
+          )}
 
           {/* Stats with staggered pop-in */}
           {/* <div className="flex flex-wrap justify-center md:justify-start gap-8 sm:gap-12">

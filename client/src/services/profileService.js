@@ -47,7 +47,8 @@ export const profileService = {
     const url = `${API_BASE_URL.replace(/\/$/, "")}/profile/cv/download`;
     const response = await fetch(url, { method: "GET", credentials: "omit" });
     if (!response.ok) {
-      throw new Error("Failed to download CV");
+      const error = await response.json();
+      throw new Error(error.message || "Failed to download CV");
     }
 
     const contentType = (response.headers.get("content-type") || "").toLowerCase();

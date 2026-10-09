@@ -7,13 +7,6 @@ function normalizePdfName(name) {
   return fileName.replace(/[^\w.\-() ]+/g, "_");
 }
 
-/** Force Cloudinary to send the file as a downloadable attachment. */
-function toCloudinaryAttachmentUrl(url, fileName) {
-  if (!url || !url.includes("/upload/")) return url;
-  const safe = encodeURIComponent(normalizePdfName(fileName).replace(/\.pdf$/i, ""));
-  return url.replace("/upload/", `/upload/fl_attachment:${safe}.pdf/`);
-}
-
 function getPublicApiBase(req) {
   if (process.env.SERVER_URL) return process.env.SERVER_URL.replace(/\/$/, "");
   const host = req.get("host");
@@ -62,7 +55,7 @@ exports.getPublicProfile = async (req, res) => {
 
 /**
  * Download CV as PDF attachment.
- * Streams PDF bytes (never HTML). Falls back to Cloudinary fl_attachment.
+ * Streams PDF bytes (never HTML).
  * @route   GET /api/profile/cv/download
  * @access  Public
  */
@@ -78,31 +71,46 @@ exports.downloadCv = async (req, res) => {
     }
 
     const safeName = normalizePdfName(admin.cv.originalName);
-    const attachmentUrl = toCloudinaryAttachmentUrl(admin.cv.url, safeName);
-
+    let fileResponse;
     try {
-      const fileResponse = await fetch(admin.cv.url);
-      if (fileResponse.ok) {
-        const buffer = Buffer.from(await fileResponse.arrayBuffer());
-        const looksLikePdf = buffer.length > 4 && buffer.subarray(0, 4).toString() === "%PDF";
-        const contentType = fileResponse.headers.get("content-type") || "";
-
-        if (looksLikePdf && !contentType.includes("text/html")) {
-          res.setHeader("Content-Type", "application/pdf");
-          res.setHeader(
-            "Content-Disposition",
-            `attachment; filename="${safeName}"; filename*=UTF-8''${encodeURIComponent(safeName)}`,
-          );
-          res.setHeader("Content-Length", buffer.length);
-          res.setHeader("Cache-Control", "no-store");
-          return res.send(buffer);
-        }
-      }
-    } catch {
-      /* fall through to Cloudinary attachment redirect */
+      fileResponse = await fetch(admin.cv.url);
+    } catch (error) {
+      console.error("CV download: failed to retrieve the file from Cloudinary", error);
+      return res.status(502).json({
+        success: false,
+        message: "Unable to retrieve the CV from Cloudinary. Please try again later.",
+      });
     }
 
-    return res.redirect(302, attachmentUrl);
+    if (!fileResponse.ok) {
+      console.error(`CV download: Cloudinary responded with HTTP ${fileResponse.status}`);
+      return res.status(502).json({
+        success: false,
+        message:
+          "Cloudinary is blocking PDF delivery. Enable 'Allow delivery of PDF and ZIP files' in Cloudinary Console > Settings > Security, then try again.",
+      });
+    }
+
+    const buffer = Buffer.from(await fileResponse.arrayBuffer());
+    const looksLikePdf =
+      buffer.length > 4 && buffer.subarray(0, 4).toString() === "%PDF";
+
+    if (!looksLikePdf) {
+      console.error("CV download: Cloudinary did not return a PDF file");
+      return res.status(502).json({
+        success: false,
+        message: "Cloudinary did not return a valid PDF file.",
+      });
+    }
+
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename="${safeName}"; filename*=UTF-8''${encodeURIComponent(safeName)}`,
+    );
+    res.setHeader("Content-Length", buffer.length);
+    res.setHeader("Cache-Control", "no-store");
+    return res.send(buffer);
   } catch (error) {
     res.status(500).json({
       success: false,
