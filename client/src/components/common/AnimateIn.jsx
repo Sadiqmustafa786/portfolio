@@ -13,10 +13,18 @@ export default function AnimateIn({
   children,
   className = "",
   delay = 0,
+  direction = "up",
   options = DEFAULT_OPTIONS,
 }) {
   const [inView, setInView] = useState(false);
   const ref = useRef(null);
+
+  const hiddenTransform = {
+    up: "translate-y-8",
+    down: "-translate-y-8",
+    left: "translate-x-8",
+    right: "-translate-x-8",
+  }[direction] ?? "translate-y-8";
 
   useEffect(() => {
     const el = ref.current;
@@ -34,8 +42,8 @@ export default function AnimateIn({
     <div
       ref={ref}
       className={`transition-all duration-700 ease-out ${
-        inView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-      } ${className}`}
+        inView ? "translate-x-0 translate-y-0 opacity-100" : `opacity-0 ${hiddenTransform}`
+      } motion-reduce:translate-x-0 motion-reduce:translate-y-0 motion-reduce:opacity-100 motion-reduce:transition-none ${className}`}
       style={{ transitionDelay: inView ? `${delay}ms` : "0ms" }}
     >
       {children}

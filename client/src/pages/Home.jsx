@@ -45,9 +45,7 @@ export default function Home() {
         <AnimateIn>
           <Hero />
         </AnimateIn>
-        <AnimateIn delay={100}>
-          <About />
-        </AnimateIn>
+        <About />
         <AnimateIn delay={100}>
           <Skills />
         </AnimateIn>
