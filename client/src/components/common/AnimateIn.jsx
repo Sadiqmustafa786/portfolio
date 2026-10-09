@@ -38,7 +38,7 @@ export default function AnimateIn({
     }
 
     const observer = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) setInView(true);
+      setInView(entry.isIntersecting);
     }, options);
 
     observer.observe(el);
