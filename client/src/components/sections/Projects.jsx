@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import ProjectCard from "./ProjectCard";
 import SectionStars from "../common/SectionStars";
@@ -24,27 +24,90 @@ function SectionShell({ children }) {
   );
 }
 
+function ProjectsLoadingState() {
+  return (
+    <div
+      className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+      role="status"
+      aria-label="Loading projects"
+    >
+      {Array.from({ length: 4 }, (_, index) => (
+        <div
+          key={index}
+          aria-hidden="true"
+          className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-800"
+        >
+          <div className="aspect-video animate-pulse bg-slate-200 dark:bg-slate-700" />
+          <div className="space-y-3 p-4">
+            <div className="h-5 w-3/4 animate-pulse rounded bg-slate-200 dark:bg-slate-700" />
+            <div className="h-4 w-full animate-pulse rounded bg-slate-200 dark:bg-slate-700" />
+            <div className="h-4 w-5/6 animate-pulse rounded bg-slate-200 dark:bg-slate-700" />
+            <div className="flex gap-2 pt-2">
+              <div className="h-6 w-16 animate-pulse rounded-full bg-slate-200 dark:bg-slate-700" />
+              <div className="h-6 w-20 animate-pulse rounded-full bg-slate-200 dark:bg-slate-700" />
+            </div>
+          </div>
+        </div>
+      ))}
+      <span className="sr-only">Loading projects…</span>
+    </div>
+  );
+}
+
 export default function Projects() {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  useEffect(() => {
+  const fetchProjects = useCallback(() => {
+    setLoading(true);
+    setError("");
     projectService
       .getAll()
       .then((res) => {
         const list = res.data?.data ?? res.data ?? [];
         setProjects(Array.isArray(list) ? list : []);
       })
-      .catch(() => setProjects([]))
+      .catch((err) => {
+        setProjects([]);
+        setError(
+          err.response?.data?.message ||
+            err.response?.data?.error ||
+            err.message ||
+            "Failed to load projects.",
+        );
+      })
       .finally(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    const timer = setTimeout(fetchProjects, 0);
+    return () => clearTimeout(timer);
+  }, [fetchProjects]);
 
   if (loading) {
     return (
       <SectionShell>
-        <p className="text-center text-slate-500 dark:text-slate-400">
-          Loading...
-        </p>
+        <ProjectsLoadingState />
+      </SectionShell>
+    );
+  }
+
+  if (error) {
+    return (
+      <SectionShell>
+        <div className="mx-auto max-w-lg rounded-2xl border border-red-200 bg-red-50 p-6 text-center dark:border-red-900/60 dark:bg-red-950/30">
+          <p className="text-sm text-red-700 dark:text-red-300" role="alert">
+            Unable to load projects: {error}
+          </p>
+          <button
+            type="button"
+            onClick={fetchProjects}
+            className="mt-4 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary/90"
+          >
+            Try again
+          </button>
+        </div>
       </SectionShell>
     );
   }
