@@ -42,9 +42,7 @@ export default function Home() {
       </div>
 
       <div className="relative z-10">
-        <AnimateIn>
-          <Hero />
-        </AnimateIn>
+        <Hero />
         <About />
         <AnimateIn delay={100}>
           <Skills />

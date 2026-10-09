@@ -13,6 +13,7 @@ import { useAuthStore } from "../../stores/authStore";
 import { profileService } from "../../services/profileService";
 import heroImage from "../../assets/images/hero.jpeg";
 import { ROUTES } from "../../utils/constants";
+import AnimateIn from "../common/AnimateIn";
 import SectionStars from "../common/SectionStars";
 
 const HERO_STATS = [
@@ -110,7 +111,11 @@ export default function Hero() {
 
       <div className="relative z-10 mx-auto grid w-full max-w-6xl grid-cols-1 items-center gap-8 md:grid-cols-2 md:gap-12">
         {/* Left: content */}
-        <div className="order-2 text-center md:order-1 md:text-left">
+        <AnimateIn
+          className="order-2 text-center md:order-1 md:text-left"
+          duration={1000}
+          direction="left"
+        >
           <h1
             className="hero-animate mb-4 text-3xl font-bold leading-tight text-slate-100 sm:text-4xl lg:text-[2.75rem]"
             style={{
@@ -219,10 +224,15 @@ export default function Hero() {
               </div>
             ))}
           </div> */}
-        </div>
+        </AnimateIn>
 
         {/* Right: image */}
-        <div className="order-1 md:order-2 relative flex justify-center md:justify-end">
+        <AnimateIn
+          className="order-1 md:order-2 relative flex justify-center md:justify-end"
+          duration={1000}
+          direction="right"
+          delay={150}
+        >
           <div className="relative h-60 w-60 sm:h-80 sm:w-80">
             {/* Gradient circle + image */}
             <div
@@ -264,7 +274,7 @@ export default function Hero() {
               ))}
             </div>
           </div>
-        </div>
+        </AnimateIn>
       </div>
     </section>
   );
