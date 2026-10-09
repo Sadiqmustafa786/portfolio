@@ -1,14 +1,17 @@
 import { useEffect } from "react";
-import { useThemeStore } from "../../stores/themeStore";
 
+/** Forces dark theme site-wide. Light mode is disabled. */
 export default function ThemeApply() {
-  const theme = useThemeStore((state) => state.theme);
-
   useEffect(() => {
     const root = document.documentElement;
-    root.classList.remove("light", "dark");
-    root.classList.add(theme || "light");
-  }, [theme]);
+    root.classList.remove("light");
+    root.classList.add("dark");
+    try {
+      localStorage.removeItem("theme-storage");
+    } catch {
+      /* ignore */
+    }
+  }, []);
 
   return null;
 }

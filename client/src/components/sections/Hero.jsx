@@ -76,7 +76,7 @@ export default function Hero() {
 
   return (
     <section
-      className="min-h-[65vh] flex flex-col justify-center px-4 py-16 bg-white dark:bg-slate-900 relative overflow-hidden"
+      className="relative flex min-h-[50vh] flex-col justify-center overflow-hidden bg-slate-900 px-4 py-10 sm:py-12"
       aria-label="Hero introduction"
     >
       <SectionStars count={10} />
@@ -90,11 +90,11 @@ export default function Hero() {
         }}
       />
 
-      <div className="max-w-6xl mx-auto w-full grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 items-center relative z-10">
+      <div className="relative z-10 mx-auto grid w-full max-w-6xl grid-cols-1 items-center gap-8 md:grid-cols-2 md:gap-12">
         {/* Left: content */}
-        <div className="text-center md:text-left order-2 md:order-1">
+        <div className="order-2 text-center md:order-1 md:text-left">
           <h1
-            className="hero-animate text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-800 dark:text-slate-100 mb-5 leading-tight"
+            className="hero-animate mb-4 text-3xl font-bold leading-tight text-slate-100 sm:text-4xl lg:text-[2.75rem]"
             style={{
               animation: "hero-fade-up 0.65s ease-out both",
               animationDelay: HERO_STAGGER.TITLE,
@@ -107,7 +107,7 @@ export default function Hero() {
             Building Apps That Scale & Deliver
           </h1>
           <p
-            className="hero-animate text-lg text-slate-600 dark:text-slate-300 max-w-xl mb-8 leading-relaxed"
+            className="hero-animate mb-6 max-w-xl text-base leading-relaxed text-slate-300 sm:text-lg"
             style={{
               animation: "hero-fade-up 0.65s ease-out both",
               animationDelay: HERO_STAGGER.SUBTITLE,
@@ -118,7 +118,7 @@ export default function Hero() {
             project!
           </p>
           <div
-            className="hero-animate flex flex-wrap items-center gap-4 mb-10"
+            className="hero-animate mb-8 flex flex-wrap items-center gap-3 sm:gap-4"
             style={{
               animation: "hero-fade-up 0.65s ease-out both",
               animationDelay: HERO_STAGGER.CTAS,
@@ -176,7 +176,7 @@ export default function Hero() {
           </div>
 
           {/* Stats with staggered pop-in */}
-          <div className="flex flex-wrap justify-center md:justify-start gap-8 sm:gap-12">
+          {/* <div className="flex flex-wrap justify-center md:justify-start gap-8 sm:gap-12">
             {HERO_STATS.map(({ value, label }, i) => (
               <div
                 key={label}
@@ -194,12 +194,12 @@ export default function Hero() {
                 </div>
               </div>
             ))}
-          </div>
+          </div> */}
         </div>
 
         {/* Right: image */}
         <div className="order-1 md:order-2 relative flex justify-center md:justify-end">
-          <div className="relative w-72 h-72 sm:w-96 sm:h-96">
+          <div className="relative h-60 w-60 sm:h-80 sm:w-80">
             {/* Gradient circle + image */}
             <div
               className="hero-animate absolute inset-0 rounded-full bg-linear-to-br from-primary to-secondary p-2 sm:p-2.5"

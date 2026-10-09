@@ -12,7 +12,7 @@
 /* Base styles */
 @layer base {
   body {
-    @apply antialiased bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100;
+    @apply antialiased bg-slate-900 text-slate-100;
   }
 }
 
