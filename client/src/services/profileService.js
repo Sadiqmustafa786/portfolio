@@ -1,6 +1,4 @@
-import api from "./api.js";
-
-const API_BASE = import.meta.env.VITE_API_URL || "https://portfolio-55af.vercel.app/api";
+import api, { API_BASE_URL } from "./api.js";
 
 /** Public portfolio profile - for Hero name/display when not logged in */
 export const profileService = {
@@ -38,6 +36,42 @@ export const profileService = {
   /** Admin: remove CV */
   deleteCv: () => api.delete("/profile/cv"),
 
-  /** Public CV download URL (opens/saves PDF) */
-  getCvDownloadUrl: () => `${API_BASE}/profile/cv/download`,
+  /** Absolute API URL for CV download */
+  getCvDownloadUrl: () => `${API_BASE_URL.replace(/\/$/, "")}/profile/cv/download`,
+
+  /**
+   * Fetch CV as a PDF blob and trigger a real file download.
+   * Avoids saving the SPA HTML when a relative URL is used by mistake.
+   */
+  downloadCvFile: async (fileName = "CV.pdf") => {
+    const url = `${API_BASE_URL.replace(/\/$/, "")}/profile/cv/download`;
+    const response = await fetch(url, { method: "GET", credentials: "omit" });
+    if (!response.ok) {
+      throw new Error("Failed to download CV");
+    }
+
+    const contentType = (response.headers.get("content-type") || "").toLowerCase();
+    const blob = await response.blob();
+
+    if (
+      contentType.includes("text/html") ||
+      contentType.includes("application/json")
+    ) {
+      throw new Error("Server did not return a PDF file");
+    }
+
+    const pdfBlob =
+      blob.type === "application/pdf"
+        ? blob
+        : new Blob([blob], { type: "application/pdf" });
+
+    const objectUrl = URL.createObjectURL(pdfBlob);
+    const link = document.createElement("a");
+    link.href = objectUrl;
+    link.download = fileName.endsWith(".pdf") ? fileName : `${fileName}.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(objectUrl);
+  },
 };

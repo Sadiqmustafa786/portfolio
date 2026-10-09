@@ -1,6 +1,27 @@
 const Admin = require("../models/Admin");
 const { deleteAsset } = require("../utils/cloudinary");
 
+function normalizePdfName(name) {
+  let fileName = name || "CV.pdf";
+  if (!/\.pdf$/i.test(fileName)) fileName = `${fileName}.pdf`;
+  return fileName.replace(/[^\w.\-() ]+/g, "_");
+}
+
+/** Force Cloudinary to send the file as a downloadable attachment. */
+function toCloudinaryAttachmentUrl(url, fileName) {
+  if (!url || !url.includes("/upload/")) return url;
+  const safe = encodeURIComponent(normalizePdfName(fileName).replace(/\.pdf$/i, ""));
+  return url.replace("/upload/", `/upload/fl_attachment:${safe}.pdf/`);
+}
+
+function getPublicApiBase(req) {
+  if (process.env.SERVER_URL) return process.env.SERVER_URL.replace(/\/$/, "");
+  const host = req.get("host");
+  if (!host) return "";
+  const proto = req.get("x-forwarded-proto") || req.protocol || "https";
+  return `${proto}://${host}`;
+}
+
 /**
  * Public portfolio profile - returns first admin's name/email for Hero display.
  * @route   GET /api/profile
@@ -18,6 +39,7 @@ exports.getPublicProfile = async (req, res) => {
     }
 
     const hasCv = !!admin.cv?.filename;
+    const apiBase = getPublicApiBase(req);
 
     res.status(200).json({
       success: true,
@@ -25,7 +47,7 @@ exports.getPublicProfile = async (req, res) => {
         name: admin.name,
         email: admin.email,
         hasCv,
-        cvDownloadUrl: hasCv ? "/api/profile/cv/download" : null,
+        cvDownloadUrl: hasCv ? `${apiBase}/api/profile/cv/download` : null,
         cvFileName: hasCv ? admin.cv.originalName : null,
       },
     });
@@ -40,6 +62,7 @@ exports.getPublicProfile = async (req, res) => {
 
 /**
  * Download CV as PDF attachment.
+ * Streams PDF bytes (never HTML). Falls back to Cloudinary fl_attachment.
  * @route   GET /api/profile/cv/download
  * @access  Public
  */
@@ -47,21 +70,39 @@ exports.downloadCv = async (req, res) => {
   try {
     const admin = await Admin.findOne().select("cv").lean();
 
-    if (!admin?.cv?.filename) {
+    if (!admin?.cv?.filename || !admin.cv.url) {
       return res.status(404).json({
         success: false,
         message: "CV not available",
       });
     }
 
-    if (!admin.cv.url) {
-      return res.status(404).json({
-        success: false,
-        message: "CV file not found",
-      });
+    const safeName = normalizePdfName(admin.cv.originalName);
+    const attachmentUrl = toCloudinaryAttachmentUrl(admin.cv.url, safeName);
+
+    try {
+      const fileResponse = await fetch(admin.cv.url);
+      if (fileResponse.ok) {
+        const buffer = Buffer.from(await fileResponse.arrayBuffer());
+        const looksLikePdf = buffer.length > 4 && buffer.subarray(0, 4).toString() === "%PDF";
+        const contentType = fileResponse.headers.get("content-type") || "";
+
+        if (looksLikePdf && !contentType.includes("text/html")) {
+          res.setHeader("Content-Type", "application/pdf");
+          res.setHeader(
+            "Content-Disposition",
+            `attachment; filename="${safeName}"; filename*=UTF-8''${encodeURIComponent(safeName)}`,
+          );
+          res.setHeader("Content-Length", buffer.length);
+          res.setHeader("Cache-Control", "no-store");
+          return res.send(buffer);
+        }
+      }
+    } catch {
+      /* fall through to Cloudinary attachment redirect */
     }
 
-    res.redirect(admin.cv.url);
+    return res.redirect(302, attachmentUrl);
   } catch (error) {
     res.status(500).json({
       success: false,

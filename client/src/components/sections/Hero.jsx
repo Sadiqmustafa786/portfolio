@@ -51,6 +51,7 @@ const TECH_ICONS = [
 export default function Hero() {
   const user = useAuthStore((state) => state.user);
   const [publicProfile, setPublicProfile] = useState(null);
+  const [cvDownloading, setCvDownloading] = useState(false);
 
   useEffect(() => {
     profileService
@@ -70,9 +71,25 @@ export default function Hero() {
     "Your Name";
   const imageUrl = user?.image ?? user?.avatar ?? heroImage;
   const hasCv = !!publicProfile?.hasCv;
-  const cvDownloadUrl = hasCv
-    ? publicProfile?.cvDownloadUrl || profileService.getCvDownloadUrl()
-    : null;
+  const cvFileName = publicProfile?.cvFileName?.endsWith(".pdf")
+    ? publicProfile.cvFileName
+    : publicProfile?.cvFileName
+      ? `${publicProfile.cvFileName}.pdf`
+      : "CV.pdf";
+
+  const handleCvDownload = async (event) => {
+    event.preventDefault();
+    if (cvDownloading) return;
+    setCvDownloading(true);
+    try {
+      await profileService.downloadCvFile(cvFileName);
+    } catch {
+      // Fallback: open API download URL directly (not the frontend)
+      window.location.assign(profileService.getCvDownloadUrl());
+    } finally {
+      setCvDownloading(false);
+    }
+  };
 
   return (
     <section
@@ -131,10 +148,11 @@ export default function Hero() {
               Hire Me
             </Link>
             {hasCv && (
-              <a
-                href={cvDownloadUrl}
-                download={publicProfile?.cvFileName || "CV.pdf"}
-                className="inline-flex items-center gap-2 px-6 py-3.5 border-2 border-primary text-primary dark:text-primary font-semibold rounded-lg hover:bg-primary hover:text-white dark:hover:text-white transition-all duration-200"
+              <button
+                type="button"
+                onClick={handleCvDownload}
+                disabled={cvDownloading}
+                className="inline-flex items-center gap-2 px-6 py-3.5 border-2 border-primary text-primary dark:text-primary font-semibold rounded-lg hover:bg-primary hover:text-white dark:hover:text-white transition-all duration-200 disabled:cursor-wait disabled:opacity-70"
               >
                 <svg
                   className="w-5 h-5"
@@ -150,8 +168,8 @@ export default function Hero() {
                     d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                   />
                 </svg>
-                Download CV
-              </a>
+                {cvDownloading ? "Downloading..." : "Download CV"}
+              </button>
             )}
             <Link
               to={ROUTES.PROJECTS}
