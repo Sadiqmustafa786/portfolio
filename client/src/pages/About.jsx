@@ -2,18 +2,18 @@ import AnimateIn from "../components/common/AnimateIn";
 
 const HIGHLIGHTS = [
   {
-    title: "Full-Stack",
-    description: "End-to-end development with MERN — from database to UI.",
+    title: "MERN Development",
+    description: "Full-stack web apps built with MongoDB, Express, React, and Node.js.",
     icon: "⚡",
   },
   {
-    title: "Clean & Scalable",
-    description: "Maintainable code, RESTful APIs, and modern architecture.",
+    title: "AI & n8n Automation",
+    description: "Practical workflows that connect tools and automate repetitive tasks.",
     icon: "🔧",
   },
   {
-    title: "User-First",
-    description: "Fast, accessible interfaces that users love to use.",
+    title: "Reliable Solutions",
+    description: "Thoughtful, user-friendly experiences designed to work smoothly.",
     icon: "✨",
   },
 ];
@@ -32,37 +32,34 @@ export default function About() {
         </AnimateIn>
         <AnimateIn delay={100} direction="up" animateOnMount>
           <p className="text-center text-slate-500 dark:text-slate-400 text-sm mb-12 max-w-xl mx-auto">
-            Passionate about building products that matter
+            Building web applications and smart automations that solve real problems
           </p>
         </AnimateIn>
 
         <div className="grid md:grid-cols-2 gap-12 items-start mb-14">
           <AnimateIn
-            className="duration-1000"
+            duration={1000}
             delay={200}
             direction="left"
             animateOnMount
           >
             <div className="space-y-4 text-slate-600 dark:text-slate-300 leading-relaxed">
               <p>
-                I'm a{" "}
-                <span className="font-semibold text-primary">
-                  MERN Stack Developer
-                </span>{" "}
-                focused on building fast, scalable web applications. From database
-                design to responsive UIs, I enjoy turning ideas into products that
-                perform.
+                I'm a <span className="font-semibold text-primary">MERN Stack Developer</span>{" "}
+                with 1+ year of experience building full-stack web applications.
+                I work across the stack—from designing data models and APIs to
+                creating responsive React interfaces.
               </p>
               <p>
-                I work with <strong>MongoDB</strong>, <strong>Express</strong>,{" "}
-                <strong>React</strong>, and <strong>Node.js</strong>, plus modern
-                tools like Tailwind CSS and REST APIs, to ship clean code that
-                users and teams love.
+                I also build AI-powered automation workflows with <strong>n8n</strong>,
+                connecting services and streamlining repetitive processes. I enjoy
+                combining software development and automation to turn ideas into
+                useful, maintainable solutions.
               </p>
             </div>
           </AnimateIn>
           <AnimateIn
-            className="duration-1000"
+            duration={1000}
             delay={350}
             direction="right"
             animateOnMount
@@ -75,19 +72,19 @@ export default function About() {
               <ul className="space-y-2 text-slate-600 dark:text-slate-300 text-sm">
                 <li className="flex items-center gap-2">
                   <span className="text-primary">•</span> Full-stack web apps with
-                  MERN
+                  MongoDB, Express, React & Node.js
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="text-primary">•</span> RESTful API design &
-                  integration
+                  <span className="text-primary">•</span> REST API development
+                  and integration
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="text-primary">•</span> Responsive, accessible
-                  UIs
+                  <span className="text-primary">•</span> AI and workflow
+                  automation with n8n
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="text-primary">•</span> Clean code & best
-                  practices
+                  <span className="text-primary">•</span> Responsive interfaces
+                  and maintainable code
                 </li>
               </ul>
             </div>
