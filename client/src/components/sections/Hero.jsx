@@ -22,6 +22,12 @@ const HERO_STATS = [
   { value: "240+", label: "Fine Artworks" },
 ];
 
+const HERO_TITLE_PREFIX = "MERN Stack ";
+const HERO_TITLE_HIGHLIGHT = "Developer";
+const HERO_TITLE_SUFFIX = " Building Apps That Scale & Deliver";
+const HERO_TITLE =
+  HERO_TITLE_PREFIX + HERO_TITLE_HIGHLIGHT + HERO_TITLE_SUFFIX;
+
 /** Stagger delays (ms) for hero entrance animations - single source of truth */
 const HERO_STAGGER = {
   TITLE: "0ms",
@@ -52,8 +58,47 @@ const TECH_ICONS = [
 export default function Hero() {
   const user = useAuthStore((state) => state.user);
   const [publicProfile, setPublicProfile] = useState(null);
+  const [heroTitle, setHeroTitle] = useState(HERO_TITLE);
+  const [titleDropAnimationActive, setTitleDropAnimationActive] = useState(false);
   const [cvDownloading, setCvDownloading] = useState(false);
   const [cvDownloadError, setCvDownloadError] = useState("");
+
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    let index = HERO_TITLE.length;
+    let deleting = true;
+    let timeoutId;
+
+    const animateTitle = () => {
+      if (deleting) {
+        index -= 1;
+        setHeroTitle(HERO_TITLE.slice(0, index));
+        if (index === 0) {
+          deleting = false;
+          setTitleDropAnimationActive(true);
+        }
+        timeoutId = window.setTimeout(animateTitle, index === 0 ? 500 : 45);
+        return;
+      }
+
+      index += 1;
+      setHeroTitle(HERO_TITLE.slice(0, index));
+      if (index === HERO_TITLE.length) deleting = true;
+      const currentCharacter = HERO_TITLE[index - 1];
+      timeoutId = window.setTimeout(
+        animateTitle,
+        index === HERO_TITLE.length
+          ? 1400
+          : currentCharacter === " "
+            ? 70
+            : 420,
+      );
+    };
+
+    timeoutId = window.setTimeout(animateTitle, 1400);
+    return () => window.clearTimeout(timeoutId);
+  }, []);
 
   useEffect(() => {
     profileService
@@ -123,11 +168,34 @@ export default function Hero() {
               animationDelay: HERO_STAGGER.TITLE,
             }}
           >
-            MERN Stack{" "}
-            <span className="bg-linear-to-r from-primary to-secondary bg-clip-text text-transparent">
-              Developer
-            </span>{" "}
-            Building Apps That Scale & Deliver
+            <span className="sr-only">{HERO_TITLE}</span>
+            <span aria-hidden="true">
+              {[...heroTitle].map((character, index) => {
+                if (character === " ") return character;
+
+                const isHighlighted =
+                  index >= HERO_TITLE_PREFIX.length &&
+                  index <
+                    HERO_TITLE_PREFIX.length + HERO_TITLE_HIGHLIGHT.length;
+
+                return (
+                  <span
+                    key={index}
+                    className={[
+                      titleDropAnimationActive ? "hero-title-drop-letter" : "",
+                      isHighlighted
+                        ? "bg-linear-to-r from-primary to-secondary bg-clip-text text-transparent"
+                        : "",
+                    ]
+                      .filter(Boolean)
+                      .join(" ")}
+                  >
+                    {character}
+                  </span>
+                );
+              })}
+              <span className="hero-typewriter-caret" />
+            </span>
           </h1>
           <p
             className="hero-animate mb-6 max-w-xl text-base leading-relaxed text-slate-300 sm:text-lg"
