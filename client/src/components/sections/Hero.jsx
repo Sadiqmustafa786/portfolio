@@ -58,16 +58,19 @@ const TECH_ICONS = [
 export default function Hero() {
   const user = useAuthStore((state) => state.user);
   const [publicProfile, setPublicProfile] = useState(null);
-  const [heroTitle, setHeroTitle] = useState(HERO_TITLE);
+  const [heroTitle, setHeroTitle] = useState("");
   const [titleDropAnimationActive, setTitleDropAnimationActive] = useState(false);
   const [cvDownloading, setCvDownloading] = useState(false);
   const [cvDownloadError, setCvDownloadError] = useState("");
 
   useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setHeroTitle(HERO_TITLE);
+      return;
+    }
 
-    let index = HERO_TITLE.length;
-    let deleting = true;
+    let index = 0;
+    let deleting = false;
     let timeoutId;
 
     const animateTitle = () => {
@@ -96,7 +99,7 @@ export default function Hero() {
       );
     };
 
-    timeoutId = window.setTimeout(animateTitle, 1400);
+    animateTitle();
     return () => window.clearTimeout(timeoutId);
   }, []);
 
